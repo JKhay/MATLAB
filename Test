@@ -1,0 +1,42 @@
+clc
+clear all
+format short
+
+ N = 10; % Space points
+ dt = 0.1; % Time step
+ t_max = 1; % Time of simulation (s)
+ M = fix(t_max/dt); % Number of time layers
+ x = linspace(0, 0.1, N); % Space discretization
+ 
+ % Tri-diagonal matrix
+ Tridiag = zeros(N, N);
+ 
+ % Diagonal values
+ diagonal_1 = -2;
+ diagonal_2 = 4; % Main diagonal
+ diagonal_3 = 2;
+ 
+ for j=1:M
+  for k=1:N % Creation of the Tri-diagonal matrix     
+     
+     if k == 1         
+        % Filling diagonals
+        Tridiag(k,k+1) = diagonal_1;
+        Tridiag(k,k)   = 1; % Main diagonal
+        
+     elseif k == N         
+        % Filling diagonals
+        Tridiag(k,k)   = -1; % Main diagonal
+        Tridiag(k,k-1) = diagonal_3;
+        
+     else          
+        % Filling diagonals
+        Tridiag(k,k+1) = diagonal_1;
+        Tridiag(k,k)   = diagonal_2; % Main diagonal
+        Tridiag(k,k-1) = diagonal_3; 
+     end
+     
+  end
+ end
+ 
+ Tridiag

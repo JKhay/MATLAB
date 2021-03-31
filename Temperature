@@ -2,7 +2,7 @@
 % Heat transfer numerical solution test
 % Implicit and explicit formula
 
-function Teplota
+function Temperature
   clear all
   clc
   

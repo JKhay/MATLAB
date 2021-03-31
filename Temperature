@@ -1,0 +1,102 @@
+
+% Heat transfer numerical solution test
+% Implicit and explicit Euler's formula
+
+function Temperature
+  clear all
+  clc
+  
+  heat_coefficient = 0.03;
+  
+  dt    = 0.0001; % time step (s)
+  dx    = 0.01; % positional step (m)
+  time   = 1; % (s)
+  length = 0.5 % (m)
+  t_count = fix(time/dt) % number of time nodes
+  x_count = fix(length/dx) % number of positional nodes
+  
+  T1  = zeros(x_count,1); % Explicit method
+  T2  = zeros(x_count,1); % Implicit method
+  pS  = zeros(x_count,1); % Implicit method (right side of the equation, constant value)
+  MAT = zeros(x_count,x_count); % Tri-diagonal matrix - for implicit method
+  
+  curve_count = 10; % Number of curves that are plotted
+  time_count = 0; % Time cycle count
+  
+  % Tri-diagonal matrix diagonals specification
+  A = 1;
+  B = -(dx^2/(heat_coefficient*dt) + 2); % Main diagonal
+  C = A;
+  
+  for j=1:t_count % Cycle over time nodes
+      
+      for i=1:x_count % Cycle over positional nodes
+          
+          if i == 1
+            T1(i) = 100; % Initial condition
+            T2(i) = 100; % Initial condition
+            MAT(i,i) = B;
+            MAT(i,i+1) = C;
+            
+          elseif i == x_count
+            T1(i) = T1(i-1);
+            T2(i) = T2(i-1);
+            MAT(i,i-1)= A;
+            MAT(i,i) = B;
+            
+          else
+            % Euler's explicit discretization
+            T1(i) = T1(i) + heat_coefficient*((T1(i+1)-2*T1(i)+T1(i-1))/dx^2)*dt; 
+            
+            % Implicit method - creation of tri-diagonal matrix
+            MAT(i,i-1)=A;
+            MAT(i,i)  =B;
+            MAT(i,i+1)=C;
+          end
+          
+          % Right side of the equation
+          pS(i) = -(T2(i)*dx^2)/(heat_coefficient*dt);
+          
+          
+      end
+      
+      %  PDEs, function
+      T2 = EQsystem(MAT,pS);
+      
+      % Condition to plot only a certain number of temperature curves
+      if fix(j/(t_count/curve_count)) == j/(t_count/curve_count)
+         if time_count == 0
+             y_out1 = T1;
+             y_out2 = T2;
+             time_count = time_count + 1;
+         else
+             y_out1 = [y_out1 T1];
+             y_out2 = [y_out2 T2];
+             time_count = time_count + 1;
+         end
+      end
+      
+  end
+  
+  x = linspace(0, length, x_count); % Nodes along the axial axis
+  % Graph
+  subplot(2,1,2); 
+  plot(x, y_out1); % Explicit
+  title('Explicit')
+  subplot(2,1,1); 
+  plot(x, y_out2); % Implicit
+  title('Implicit')
+  
+end
+
+function x=EQsystem(A,b)
+    % Algebraic EQs solver
+    % A ... matrix
+    % b ... right side vector
+    % x ... solution of the algebraic EQs
+    if det(A)==0
+       error('!')
+    end
+    x = A\b; % solution
+    % x = inv(A)*b; % Another possibility to obtain a solution
+end

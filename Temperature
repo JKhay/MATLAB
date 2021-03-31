@@ -1,8 +1,8 @@
 
 % Heat transfer numerical solution test
-% Implicit and explicit Euler's formula
+% Implicit and explicit formula
 
-function Temperature
+function Teplota
   clear all
   clc
   
@@ -33,15 +33,15 @@ function Temperature
       for i=1:x_count % Cycle over positional nodes
           
           if i == 1
-            T1(i) = 100; % Initial condition
-            T2(i) = 100; % Initial condition
+            T1(i) = 100; % Initial condition for explicit method
+            T2(i) = 100; % Initial condition for implicit method
             MAT(i,i) = B;
             MAT(i,i+1) = C;
             
           elseif i == x_count
-            T1(i) = T1(i-1);
-            T2(i) = T2(i-1);
-            MAT(i,i-1)= A;
+            T1(i) = T1(i-1); % B.C. for explicit method (last equals the next-to-last)
+            T2(i) = T2(i-1); % B.C. for implicit method (last equals the next-to-last)
+            MAT(i,i-1)= A; 
             MAT(i,i) = B;
             
           else
@@ -95,7 +95,7 @@ function x=EQsystem(A,b)
     % b ... right side vector
     % x ... solution of the algebraic EQs
     if det(A)==0
-       error('No solution exists!')
+       error('!')
     end
     x = A\b; % solution
     % x = inv(A)*b; % Another possibility to obtain a solution

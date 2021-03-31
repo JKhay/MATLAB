@@ -95,7 +95,7 @@ function x=EQsystem(A,b)
     % b ... right side vector
     % x ... solution of the algebraic EQs
     if det(A)==0
-       error('!')
+       error('No solution exists!')
     end
     x = A\b; % solution
     % x = inv(A)*b; % Another possibility to obtain a solution
